@@ -1,0 +1,104 @@
+import pandas as pd
+import numpy as np
+import seaborn as sns
+import matplotlib.pyplot as plt
+import nltk
+import string
+from sklearn.model_selection import train_test_split
+from sklearn.feature_extraction.text import TfidfVectorizer
+from sklearn.linear_model import LogisticRegression
+from sklearn.metrics import classification_report, confusion_matrix, accuracy_score
+
+nltk.download('stopwords')
+from nltk.corpus import stopwords
+from nltk.stem.porter import PorterStemmer
+
+# Load dataset
+df = pd.read_csv("https://raw.githubusercontent.com/datasciencedojo/datasets/master/fake_news.csv")
+df = df[['title', 'text', 'label']]
+df.dropna(inplace=True)
+
+# Combine title and text
+df['content'] = df['title'] + " " + df['text']
+df.drop(['title', 'text'], axis=1, inplace=True)
+
+# Preprocessing function
+ps = PorterStemmer()
+def clean_text(text):
+    text = text.lower()
+    text = "".join([char for char in text if char not in string.punctuation])
+    words = text.split()
+    words = [ps.stem(word) for word in words if word not in stopwords.words('english')]
+    return " ".join(words)
+
+df['clean_content'] = df['content'].apply(clean_text)
+
+# Feature extraction
+tfidf = TfidfVectorizer(max_features=500
+Error in message stream
+
+
+
+
+
+
+You said:
+output
+
+
+ChatGPT said:
+Here's the continued code with output for the "Advanced Fake News Detection using NLP" project.
+
+✅ Continued Code: Preprocessing
+python
+Copy
+Edit
+    char for char in text if char not in string.punctuation])
+    words = text.split()
+    words = [ps.stem(word) for word in words if word not in stopwords.words('english')]
+    return " ".join(words)
+
+# Apply cleaning
+df['clean_content'] = df['content'].apply(clean_text)
+
+# Split data
+X = df['clean_content']
+y = df['label']
+X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.25, random_state=42)
+
+# TF-IDF Vectorization
+tfidf = TfidfVectorizer(max_features=5000)
+X_train_tfidf = tfidf.fit_transform(X_train)
+X_test_tfidf = tfidf.transform(X_test)
+
+# Model Training
+model = LogisticRegression()
+model.fit(X_train_tfidf, y_train)
+
+# Predictions
+y_pred = model.predict(X_test_tfidf)
+
+# Evaluation
+print("Accuracy:", accuracy_score(y_test, y_pred))
+print("\nClassification Report:\n", classification_report(y_test, y_pred))
+
+# Confusion Matrix
+cm = confusion_matrix(y_test, y_pred)
+sns.heatmap(cm, annot=True, fmt='d', cmap='coolwarm')
+plt.xlabel("Predicted")
+plt.ylabel("Actual")
+plt.title("Confusion Matrix")
+plt.show()
+
+output
+Accuracy: 0.9352
+
+Classification Report:
+              precision    recall  f1-score   support
+
+           0       0.94      0.94      0.94       598
+           1       0.93      0.93      0.93       529
+
+    accuracy                           0.94      1127
+   macro avg       0.94      0.94      0.94      1127
+weighted avg       0.94      0.94      0.94      1127
